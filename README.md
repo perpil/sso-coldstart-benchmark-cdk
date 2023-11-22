@@ -11,7 +11,7 @@ Here were the results of the benchmark with SSO omitted and included and with an
 | 578.52       | omitted  | on         | 307.3438          |
 | 288          | included | on         | 341.46            |
 
-These are the packages that it removes when you turn off SSO:
+These are the packages that it removes when you omit SSO:
 
 ```
 @aws-sdk/token-providers
