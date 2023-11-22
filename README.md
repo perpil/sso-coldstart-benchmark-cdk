@@ -5,9 +5,9 @@ This benchmarks the impact of removing the SSO packages (which shouldn't be used
 These are the packages that it removes when you turn off SSO:
 
 ```
-'@aws-sdk/token-providers',
-'@aws-sdk/client-sso',
-'@aws-sdk/credential-provider-sso',
+@aws-sdk/token-providers
+@aws-sdk/client-sso
+@aws-sdk/credential-provider-sso
 ```
 
 # Setup
