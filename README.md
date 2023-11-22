@@ -1,6 +1,6 @@
 # Overview
 
-This benchmarks the impact of removing the SSO packages (which shouldn't be used) from a Lambda function minified and tree-shaken with esbuild. Surprisingly, removing the SSO packages increases the coldstart by ~300 ms! [The CDK package](coldstart-benchmark-stack.mjs) creates an API Gateway that invokes a lambda that instantiates a STS client and calls `getCallerIdentity`.
+This benchmarks the impact of removing the SSO packages (which shouldn't be used) from a Lambda function minified and tree-shaken with esbuild. Surprisingly, removing the SSO packages increases the coldstart by ~270 ms! [The CDK package](coldstart-benchmark-stack.mjs) creates an API Gateway that invokes a lambda that instantiates a STS client and calls `getCallerIdentity`.
 
 Here were the results of the benchmark with SSO omitted and included and with and without powertools:
 
