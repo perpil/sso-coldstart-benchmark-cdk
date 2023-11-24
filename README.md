@@ -1,6 +1,6 @@
 # Overview
 
-This benchmarks the impact of removing the SSO packages from a Lambda function minified and tree-shaken with esbuild. Removing SSO reduces coldstarts by 39 ms and filesize by 43.7 KB.
+This benchmarks the impact of removing the unnecessary credential providers (like SSO) from `credential-provider-node` in a Lambda function minified and tree-shaken with esbuild. Removing SSO reduces coldstarts by 39 ms and filesize by 43.7 KB.
 
 ---
 
@@ -43,7 +43,7 @@ export const defaultProvider = (init = {}) =>
   );
 ```
 
-This removes the unnecessary SSO provider and others from the credentials provider chain so these packages aren't loaded.
+This removes the unnecessary SSO provider and others from the credentials provider chain so these packages aren't included in the bundle and loaded.
 
 # Running a coldstart
 
