@@ -6,8 +6,9 @@ This benchmarks the impact of removing the unnecessary credential providers (lik
 
 | @initDuration | hasSSO | minifiedSize (KB) |
 | ------------- | ------ | ----------------- |
-| 242.89        | 1      | 174.8164          |
-| 203.32        | 0      | 131.1631          |
+| 242.89        | yes      | 174.8164          |
+| 203.32        | no      | 131.1631          |
+| 538.29        | yes from disk |140.7314|
 
 ---
 
@@ -64,12 +65,17 @@ To invoke, hit the url in the output.
 
 # Toggling SSO
 
-If you've never done anything, SSO will be enabled. To remove SSO, run the following command.
+If you've never done anything, SSO will be enabled. 
+
+## Removing SSO
+To remove SSO, run the following command.
 
 ```
 npm run removeSSO
 ```
+Then follow the instructions for [Running a coldstart](#running-a-coldstart) above
 
+## Reenabling SSO
 To re-enable SSO, run the following command.
 
 ```
@@ -78,16 +84,29 @@ npm run addSSO
 
 Then follow the instructions for [Running a coldstart](#running-a-coldstart) above
 
+## Loading SSO from disk
+
+With SSO enabled, modify `externalModules` in the [cdk stack](lib/coldstart-benchmark-stack.mjs) to:
+
+```javascript
+externalModules: [
+  '@aws-sdk/client-sso',
+  '@aws-sdk/token-providers',
+  '@aws-sdk/credential-provider-sso',
+]
+```
+This will exclude those packages from the bundle and load them from disk.
+
+Then follow the instructions for [Running a coldstart](#running-a-coldstart) above
+
 # Seeing the results
 
-To see the results, run the following CloudWatch Insights query.
+To see the results, run the following CloudWatch Insights query on the LogGroup: `/aws/lambda/ColdstartBenchmark`.
 
 ```
-
 filter ispresent(requestId) or ispresent(@requestId) |
 parse @logStream '[*]' as @lambdaVersion |
 stats max(@initDuration), max(hasSSO) as SSO, max(fileSize) as minifiedSize by @lambdaVersion
-
 ```
 
 Or if you're logged in to the console use this link, change your region in the dropdown and click `Run query`:
