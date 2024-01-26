@@ -11,14 +11,14 @@
     "addSSO": "npx patch-package --reverse"
   },
   "devDependencies": {
-    "aws-cdk": "2.108.1",
-    "aws-cdk-lib": "2.108.1",
+    "aws-cdk": "^2.108.1",
+    "aws-cdk-lib": "^2.108.1",
     "esbuild": "^0.19.7",
     "jest": "^29.7.0",
     "patch-package": "^8.0.0"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "3.454.0",
+    "@aws-sdk/client-sts": "3.499.0",
     "constructs": "^10.0.0"
   }
 }
