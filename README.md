@@ -1,14 +1,31 @@
 # Overview
 
-This benchmarks the impact of removing the unnecessary credential providers (like SSO) from `credential-provider-node` in a Lambda function minified and tree-shaken with esbuild. Removing SSO reduces coldstarts by 39 ms and filesize by 43.7 KB.  Compared to using the on disk versions removing SSO reduces coldstarts by 335 ms.
+This benchmarks the impact of removing the unnecessary credential providers (like SSO) from `credential-provider-node` in a Lambda function minified and tree-shaken with esbuild. Removing SSO reduces coldstarts by 39 ms and filesize by 43.7 KB. Compared to using the on disk versions removing SSO reduces coldstarts by 335 ms.
+
+## With 3.454 / Node 18.x
 
 ---
 
-| @initDuration | hasSSO | minifiedSize (KB) |
-| ------------- | ------ | ----------------- |
-| 242.89        | yes      | 174.8164          |
-| 203.32        | no      | 131.1631          |
-| 538.29        | yes from disk |140.7314|
+| @initDuration | hasSSO        | minifiedSize (KB) |
+| ------------- | ------------- | ----------------- |
+| 242.89        | yes           | 174.8164          |
+| 203.32        | no            | 131.1631          |
+| 538.29        | yes from disk | 140.7314          |
+
+---
+
+## With 3.499 / Node 20.x (1/25/2024)
+
+Removing SSO reduces coldstarts by 27 ms and filesize by 61 KB. Compared to using the on disk versions removing SSO reduces coldstarts by 312 ms.
+What's strange about this is I would expect the yes from disk to have the same coldstart as the yes case. If lazy loading is working correctly, it shouldn't be loading any of the SSO packages from disk, but it is still taking longer.
+
+---
+
+| @initDuration | hasSSO        | minifiedSize (KB) |
+| ------------- | ------------- | ----------------- |
+| 204.67        | yes           | 196.5332          |
+| 177.73        | no            | 135.3945          |
+| 489.65        | yes from disk | 148.5938          |
 
 ---
 
@@ -65,17 +82,20 @@ To invoke, hit the url in the output.
 
 # Toggling SSO
 
-If you've never done anything, SSO will be enabled. 
+If you've never done anything, SSO will be enabled.
 
 ## Removing SSO
+
 To remove SSO, run the following command.
 
 ```
 npm run removeSSO
 ```
+
 Then follow the instructions for [Running a coldstart](#running-a-coldstart) above
 
 ## Reenabling SSO
+
 To re-enable SSO, run the following command.
 
 ```
@@ -93,8 +113,9 @@ externalModules: [
   '@aws-sdk/client-sso',
   '@aws-sdk/token-providers',
   '@aws-sdk/credential-provider-sso',
-]
+];
 ```
+
 This will exclude those packages from the bundle and load them from disk.
 
 Then follow the instructions for [Running a coldstart](#running-a-coldstart) above
