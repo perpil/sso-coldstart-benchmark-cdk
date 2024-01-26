@@ -40,7 +40,6 @@ npm install
 All the code does is instantiate an STS client and call `getCallerIdentity`. Using any AWS client pulls in the SSO packages unless you patch the `credentials-provider-node` package. When you patch the package, it replaces the defaultProvider with the following code.
 
 ```javascript
-import { fromEnv } from '@aws-sdk/credential-provider-env';
 import {
   chain,
   CredentialsProviderError,
@@ -48,17 +47,28 @@ import {
 } from '@smithy/property-provider';
 export const defaultProvider = (init = {}) =>
   memoize(
-    chain(...[fromEnv()], async () => {
-      throw new CredentialsProviderError(
-        'Could not load credentials from any providers',
-        false
-      );
-    }),
-    (credentials) =>
-      credentials.expiration !== undefined &&
-      credentials.expiration.getTime() - Date.now() < 300000,
-    (credentials) => credentials.expiration !== undefined
+    chain(
+      ...[
+        async () => {
+          const { fromEnv } = await import('@aws-sdk/credential-provider-env');
+          return fromEnv()();
+        },
+      ],
+      async () => {
+        throw new CredentialsProviderError(
+          'Could not load credentials from any providers',
+          false
+        );
+      }
+    ),
+    credentialsTreatedAsExpired,
+    credentialsWillNeedRefresh
   );
+export const credentialsWillNeedRefresh = (credentials) =>
+  credentials?.expiration !== undefined;
+export const credentialsTreatedAsExpired = (credentials) =>
+  credentials?.expiration !== undefined &&
+  credentials.expiration.getTime() - Date.now() < 300000;
 ```
 
 This removes the unnecessary SSO provider and others from the credentials provider chain so these packages aren't included in the bundle and loaded.
