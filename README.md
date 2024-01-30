@@ -29,6 +29,23 @@ What's strange about this is I would expect the yes from disk to have the same c
 
 ---
 
+---
+
+## With 3.502 / Node 20.x (1/29/2024)
+
+The default provider bundled with the SSO packages marked as external cold start time is now on par with the patched provider with only fromEnv.
+More packages can probably be marked as external with the default provider because the patched package results in a 43KB smaller bundle. That likely means in the patched package things like IMDS are omitted via tree shaking. The default provider bundled with SSO and no packages marked as external results in a 28 ms increase in cold start time and a 92KB increase in bundle size.
+
+---
+
+| @initDuration | hasSSO        | minifiedSize (KB) |
+| ------------- | ------------- | ----------------- |
+| 226.35        | yes           | 215.5693          |
+| 192.63        | no            | 123.7324          |
+| 190.95        | yes from disk | 166.6426          |
+
+---
+
 # Setup
 
 ```
@@ -48,12 +65,14 @@ import {
 export const defaultProvider = (init = {}) =>
   memoize(
     chain(
-      ...[
-        async () => {
-          const { fromEnv } = await import('@aws-sdk/credential-provider-env');
-          return fromEnv()();
-        },
-      ],
+      async () => {
+        init.logger?.debug(
+          '@aws-sdk/credential-provider-node',
+          'defaultProvider::fromEnv'
+        );
+        const { fromEnv } = await import('@aws-sdk/credential-provider-env');
+        return fromEnv(init)();
+      },
       async () => {
         throw new CredentialsProviderError(
           'Could not load credentials from any providers',
@@ -71,7 +90,7 @@ export const credentialsTreatedAsExpired = (credentials) =>
   credentials.expiration.getTime() - Date.now() < 300000;
 ```
 
-This removes the unnecessary SSO provider and others from the credentials provider chain so these packages aren't included in the bundle and loaded.
+This removes the unnecessary SSO provider and others from the credentials provider chain so these packages aren't included in the bundle and can be tree-shaken out.
 
 # Running a coldstart
 
