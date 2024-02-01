@@ -140,8 +140,12 @@ With SSO enabled, modify `externalModules` in the [cdk stack](lib/coldstart-benc
 ```javascript
 externalModules: [
   '@aws-sdk/client-sso',
-  '@aws-sdk/token-providers',
+  '@aws-sdk/client-sso-oidc',
+  '@aws-sdk/credential-provider-ini',
+  '@aws-sdk/credential-provider-process',
   '@aws-sdk/credential-provider-sso',
+  '@aws-sdk/credential-provider-web-identity',
+  '@aws-sdk/token-providers',
 ];
 ```
 
